@@ -42,3 +42,6 @@
 
 /favicon.ico
   Content-Type: image/x-icon
+
+/ServiceWorker.js
+  Content-Type: application/javascript
