@@ -115,6 +115,24 @@
         updateBannerVisibility();
       }
 
+      // Check for hardware acceleration by attempting to create a WebGL context
+      // and inspecting the renderer. If it contains "swiftshader", it likely means
+      // hardware acceleration is disabled.
+      function checkHardwareAcceleration() {
+        var testCanvas = document.createElement('canvas');
+        var gl = testCanvas.getContext('webgl') || testCanvas.getContext('experimental-webgl');
+        if (!gl) return false;
+        var debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+        if (debugInfo) {
+          var renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+          if (renderer && renderer.toLowerCase().includes("swiftshader")) {
+            return false;
+          }
+        }
+        return true;
+      }
+
+      // Configure Unity build settings.
       var buildUrl = "Build";
       var loaderUrl = buildUrl + "/WebGL.loader.js";
       var config = {
@@ -128,6 +146,11 @@
         productVersion: "0.1.0",
         showBanner: unityShowBanner,
       };
+
+      // Warn the user if hardware acceleration appears to be disabled.
+      if (!checkHardwareAcceleration()) {
+        unityShowBanner("Hardware acceleration appears to be disabled. Please enable hardware acceleration in your browser settings for optimal performance.", "warning");
+      }
 
       if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
         var meta = document.createElement('meta');
