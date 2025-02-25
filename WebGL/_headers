@@ -1,2 +1,6 @@
 /*.br
   Content-Encoding: br
+
+/Build/*
+  Content-Type: application/wasm
+  Content-Encoding: br
