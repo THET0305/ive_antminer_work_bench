@@ -1,4 +1,4 @@
-# ive_antminer_work_bench
+# Antminer Work Bench Interactive Training Tool - DEMO
 The IVE Antminer Work Bench tool repo for CI/CD.
 ---
 Hosted on Netlify.com
