@@ -39,3 +39,6 @@
 
 /manifest.webmanifest
   Content-Type: application/manifest+json
+
+/favicon.ico
+  Content-Type: image/x-icon
