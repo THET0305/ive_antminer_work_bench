@@ -1,6 +1,38 @@
 /*.br
   Content-Encoding: br
 
-/Build/*
+/Build/WebGL.loader.js
+  Content-Type: application/javascript
+
+/Build/WebGL.framework.js
+  Content-Type: application/javascript
+
+/Build/WebGL.data
+  Content-Type: application/octet-stream
+
+/Build/WebGL.wasm
+  Content-Type: application/wasm
+
+/Build/WebGL.wasm.br
   Content-Type: application/wasm
   Content-Encoding: br
+
+/Build/WebGL.wasm.gz
+  Content-Type: application/wasm
+  Content-Encoding: gzip
+
+/Build/WebGL.loader.js.br
+  Content-Type: application/javascript
+  Content-Encoding: br
+
+/Build/WebGL.loader.js.gz
+  Content-Type: application/javascript
+  Content-Encoding: gzip
+
+/Build/WebGL.framework.js.br
+  Content-Type: application/javascript
+  Content-Encoding: br
+
+/Build/WebGL.framework.js.gz
+  Content-Type: application/javascript
+  Content-Encoding: gzip
