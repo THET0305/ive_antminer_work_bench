@@ -84,10 +84,8 @@
       // Service Worker registration
       window.addEventListener("load", function () {
         if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register("/ServiceWorker.js")
-            .then((reg) => console.log("Service Worker registered!", reg))
-            .catch((err) => console.error("Service Worker registration failed:", err));
-    }
+          navigator.serviceWorker.register("ServiceWorker.js");
+        }
       });
 
       var container = document.querySelector("#unity-container");
