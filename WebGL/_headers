@@ -36,3 +36,6 @@
 /Build/WebGL.framework.js.gz
   Content-Type: application/javascript
   Content-Encoding: gzip
+
+/manifest.webmanifest
+  Content-Type: application/manifest+json
