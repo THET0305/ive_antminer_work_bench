@@ -60,8 +60,19 @@
     <div id="split-container">
       <!-- PDF Viewer Pane -->
       <div id="pdf-container">
-        <iframe src="AntminerS9FanRemoval.pdf"></iframe>
+        <iframe id="pdf-viewer" src="pdfjs/web/viewer.html?file=AntminerS9FanRemoval.pdf"></iframe>
       </div>
+	<script type="module">
+  		import { getDocument } from './pdfjs/build/pdf.mjs';
+
+  		async function loadPDF(pdfPath) {
+      		const loadingTask = getDocument(pdfPath);
+      		const pdf = await loadingTask.promise;
+      		console.log(`Loaded PDF: ${pdf.numPages} pages`);
+  	}
+
+  	loadPDF("AntminerS9FanRemoval.pdf"); // Load the PDF dynamically
+	</script>
       <!-- Drag Bar for resizing -->
       <div id="dragbar"></div>
       <!-- Unity WebGL Pane -->
