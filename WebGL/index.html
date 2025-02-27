@@ -221,6 +221,22 @@
           }
         });
       })();
+
+	function highlightPDFText(searchText) {
+      	    var pdfIframe = document.querySelector("#pdf-viewer");
+	    if (!pdfIframe) {
+	         console.error("PDF iframe not found.");
+	         return;
+	    }
+
+      	     // Send highlight request to PDF.js inside the iframe
+      	     pdfIframe.contentWindow.postMessage({ type: "highlight", text: searchText }, "*");
+  	 }
+
+	  // Expose function to Unity WebGL
+	  window.unityHighlightPDF = function(text) {
+	      highlightPDFText(text);
+	  };			  
     </script>
   </body>
 </html>
