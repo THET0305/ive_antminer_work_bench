@@ -30,45 +30,8 @@ See https://github.com/adobe-type-tools/cmap-resources
 <!-- This snippet is used in production (included from viewer.html) -->
 <link rel="resource" type="application/l10n" href="locale/locale.json">
 <script src="../build/pdf.mjs" type="module"></script>
-
-    <link rel="stylesheet" href="viewer.css">
-
-  <script src="viewer.mjs" type="module"></script>
-<script>
-// This listens for messages from the parent window (your Unity WebGL page).
-window.addEventListener("message", function(event) {
-    if (event.data.type === "highlight") {
-        highlightText(event.data.text);
-    }
-}, false);
-
-// This highlights the requested text inside the currently loaded PDF.
-function highlightText(text) {
-    const textLayers = document.querySelectorAll("div.textLayer");
-    if (textLayers.length === 0) {
-        console.warn("No text layers found in PDF viewer.");
-        return;
-    }
-
-    let found = false;
-
-    textLayers.forEach(layer => {
-        const spans = layer.querySelectorAll("span");
-        spans.forEach(span => {
-            if (span.innerText.includes(text)) {
-                span.style.backgroundColor = "yellow"; // Highlight found text
-                span.scrollIntoView({ behavior: "smooth", block: "center" });
-                found = true;
-            }
-        });
-    });
-
-    if (!found) {
-        console.warn(`Text "${text}" not found in PDF.`);
-    }
-}
-</script>
-      
+<link rel="stylesheet" href="viewer.css">
+<script src="viewer.mjs" type="module"></script>    
   </head>
 
   <body tabindex="0">
@@ -668,5 +631,60 @@ function highlightText(text) {
 
     </div> <!-- outerContainer -->
     <div id="printContainer"></div>
+
+      <script>
+// Stores reference to previously highlighted elements.
+let previouslyHighlightedSpans = [];
+
+// Message listener to handle highlight requests
+window.addEventListener("message", function(event) {
+    if (event.data.type === "clearHighlight") {
+        clearPreviousHighlight();
+    } else if (event.data.type === "highlight") {
+        highlightText(event.data.text);
+    }
+}, false);
+
+// Clears the previous highlight (removes background color)
+function clearPreviousHighlight() {
+    previouslyHighlightedSpans.forEach(span => {
+        span.style.backgroundColor = "transparent";
+    });
+    previouslyHighlightedSpans = [];
+}
+
+// Highlights the requested text inside the currently loaded PDF.
+function highlightText(text) {
+    clearPreviousHighlight(); // Clear old highlight first
+
+    const textLayers = document.querySelectorAll("div.textLayer");
+    if (textLayers.length === 0) {
+        console.warn("No text layers found in PDF viewer.");
+        return;
+    }
+
+    let found = false;
+
+    textLayers.forEach(layer => {
+        const spans = layer.querySelectorAll("span");
+        spans.forEach(span => {
+            if (span.innerText.includes(text)) {
+                span.style.backgroundColor = "yellow"; // Background only highlight
+                previouslyHighlightedSpans.push(span); // Store for clearing later
+
+                if (!found) {
+                    span.scrollIntoView({ behavior: "smooth", block: "center" });
+                    found = true;
+                }
+            }
+        });
+    });
+
+    if (!found) {
+        console.warn(`Text "${text}" not found in PDF.`);
+    }
+}
+</script>
+
   </body>
 </html>
