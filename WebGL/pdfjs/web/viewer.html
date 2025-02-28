@@ -632,11 +632,11 @@ See https://github.com/adobe-type-tools/cmap-resources
     </div> <!-- outerContainer -->
     <div id="printContainer"></div>
 
-      <script>
+<script>
 // Stores reference to previously highlighted elements.
 let previouslyHighlightedSpans = [];
 
-// Message listener to handle highlight requests
+// Listen for highlight or clear requests from parent (index.html)
 window.addEventListener("message", function(event) {
     if (event.data.type === "clearHighlight") {
         clearPreviousHighlight();
@@ -645,17 +645,19 @@ window.addEventListener("message", function(event) {
     }
 }, false);
 
-// Clears the previous highlight (removes background color)
+// Clear previous highlights by resetting styles
 function clearPreviousHighlight() {
     previouslyHighlightedSpans.forEach(span => {
-        span.style.backgroundColor = "transparent";
+        span.style.backgroundColor = "";  // Reset background
+        span.style.boxShadow = "";        // Remove glow
+        span.style.outline = "";           // Remove outline
     });
     previouslyHighlightedSpans = [];
 }
 
-// Highlights the requested text inside the currently loaded PDF.
+// Highlight requested text with a soft background glow
 function highlightText(text) {
-    clearPreviousHighlight(); // Clear old highlight first
+    clearPreviousHighlight();
 
     const textLayers = document.querySelectorAll("div.textLayer");
     if (textLayers.length === 0) {
@@ -664,13 +666,12 @@ function highlightText(text) {
     }
 
     let found = false;
-
     textLayers.forEach(layer => {
         const spans = layer.querySelectorAll("span");
         spans.forEach(span => {
             if (span.innerText.includes(text)) {
-                span.style.backgroundColor = "yellow"; // Background only highlight
-                previouslyHighlightedSpans.push(span); // Store for clearing later
+                span.style.boxShadow = "0 0 8px 3px rgba(255, 255, 0, 0.75)"; // Soft yellow glow
+                previouslyHighlightedSpans.push(span);
 
                 if (!found) {
                     span.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -685,6 +686,7 @@ function highlightText(text) {
     }
 }
 </script>
+
 
   </body>
 </html>
