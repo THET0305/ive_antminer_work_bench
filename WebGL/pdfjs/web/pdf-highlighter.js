@@ -1,3 +1,6 @@
+// Set the worker source path (relative to your web root)
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'pdfjs/build/pdf.worker.mjs';
+
 window.addEventListener("message", function(event) {
     if (event.data.type === "highlight") {
         highlightText(event.data.text);
