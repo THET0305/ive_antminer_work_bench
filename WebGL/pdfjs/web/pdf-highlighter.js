@@ -5,10 +5,7 @@ function highlightPDFText(searchText) {
         return;
     }
 
-    // Clear previous highlight first (in case new highlight is unrelated)
     pdfIframe.contentWindow.postMessage({ type: "clearHighlight" }, "*");
-
-    // Now send the new highlight request
     pdfIframe.contentWindow.postMessage({ type: "highlight", text: searchText }, "*");
 }
 
