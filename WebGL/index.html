@@ -91,6 +91,13 @@
     <!-- Watermark -->
     <div class="watermark">IVE</div>
 
+<!-- Load pdf.js BEFORE Unity initializes or calls loadPDF() -->
+<script src="pdfjs/build/pdf.js"></script>
+<script>
+// Set the worker source here directly!
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'pdfjs/build/pdf.worker.mjs';
+</script>
+	  
     <script>
       // Service Worker registration
       window.addEventListener("load", function () {
