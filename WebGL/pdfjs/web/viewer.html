@@ -633,32 +633,31 @@ See https://github.com/adobe-type-tools/cmap-resources
     <div id="printContainer"></div>
 
 <script>
-// Stores references to previously applied highlight wrappers.
-let previouslyHighlightedWrappers = [];
+// Stores references to previously highlighted spans.
+let previouslyHighlightedSpans = [];
 
-// Listen for highlight or clear requests from parent (index.html)
+// Listen for highlight/clear requests from parent (index.html)
 window.addEventListener("message", function(event) {
     if (event.data.type === "clearHighlight") {
         clearPreviousHighlight();
     } else if (event.data.type === "highlight") {
-        highlightText(event.data.text);
+        highlightText(event.data.text, event.data.color || "rgba(255, 255, 0, 0.5)");
     }
 }, false);
 
-// Clear previous highlights (remove the wrapper elements)
+// Clear previous highlights (restore original span styling)
 function clearPreviousHighlight() {
-    previouslyHighlightedWrappers.forEach(wrapper => {
-        if (wrapper && wrapper.parentNode) {
-            // Remove highlight but leave text intact
-            const textNode = wrapper.firstChild;
-            wrapper.parentNode.replaceChild(textNode, wrapper);
+    previouslyHighlightedSpans.forEach(span => {
+        if (span) {
+            span.style.backgroundColor = "";
+            span.style.color = "";  // Optional: In case you accidentally changed text color before
         }
     });
-    previouslyHighlightedWrappers = [];
+    previouslyHighlightedSpans = [];
 }
 
-// Highlight requested text using a highlight wrapper around each span
-function highlightText(text) {
+// Highlight requested text directly on matching spans
+function highlightText(text, highlightColor) {
     clearPreviousHighlight();
 
     const textLayers = document.querySelectorAll("div.textLayer");
@@ -674,24 +673,11 @@ function highlightText(text) {
 
         spans.forEach(span => {
             if (span.innerText.includes(text)) {
-                // Create the highlight wrapper (highlighter span)
-                const highlightWrapper = document.createElement("span");
-                highlightWrapper.style.backgroundColor = "rgba(0, 255, 0, 0.5)"; // Semi-transparent yellow
-                highlightWrapper.style.padding = "0px"; // Avoid altering layout
-                highlightWrapper.style.margin = "0px";  // Avoid altering layout
-                highlightWrapper.style.display = "inline"; // Inline to match text flow
-
-                // Wrap the span text (not the span itself) into the highlighter
-                const textNode = document.createTextNode(span.innerText);
-                highlightWrapper.appendChild(textNode);
-
-                span.innerHTML = "";  // Clear span content
-                span.appendChild(highlightWrapper);  // Insert highlight wrapper
-
-                previouslyHighlightedWrappers.push(highlightWrapper);
+                span.style.backgroundColor = highlightColor;
+                previouslyHighlightedSpans.push(span);
 
                 if (!found) {
-                    highlightWrapper.scrollIntoView({ behavior: "smooth", block: "center" });
+                    span.scrollIntoView({ behavior: "smooth", block: "center" });
                     found = true;
                 }
             }
@@ -702,7 +688,6 @@ function highlightText(text) {
         console.warn(`Text "${text}" not found in PDF.`);
     }
 }
-
 </script>
 </body>
 </html>
