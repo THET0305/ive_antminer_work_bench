@@ -34,6 +34,41 @@ See https://github.com/adobe-type-tools/cmap-resources
     <link rel="stylesheet" href="viewer.css">
 
   <script src="viewer.mjs" type="module"></script>
+<script>
+// This listens for messages from the parent window (your Unity WebGL page).
+window.addEventListener("message", function(event) {
+    if (event.data.type === "highlight") {
+        highlightText(event.data.text);
+    }
+}, false);
+
+// This highlights the requested text inside the currently loaded PDF.
+function highlightText(text) {
+    const textLayers = document.querySelectorAll("div.textLayer");
+    if (textLayers.length === 0) {
+        console.warn("No text layers found in PDF viewer.");
+        return;
+    }
+
+    let found = false;
+
+    textLayers.forEach(layer => {
+        const spans = layer.querySelectorAll("span");
+        spans.forEach(span => {
+            if (span.innerText.includes(text)) {
+                span.style.backgroundColor = "yellow"; // Highlight found text
+                span.scrollIntoView({ behavior: "smooth", block: "center" });
+                found = true;
+            }
+        });
+    });
+
+    if (!found) {
+        console.warn(`Text "${text}" not found in PDF.`);
+    }
+}
+</script>
+      
   </head>
 
   <body tabindex="0">
