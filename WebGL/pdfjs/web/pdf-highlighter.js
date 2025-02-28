@@ -4,7 +4,12 @@ function highlightPDFText(searchText) {
         console.error("PDF viewer iframe not found.");
         return;
     }
+
+    // Clear previous highlight first (in case new highlight is unrelated)
+    pdfIframe.contentWindow.postMessage({ type: "clearHighlight" }, "*");
+
+    // Now send the new highlight request
     pdfIframe.contentWindow.postMessage({ type: "highlight", text: searchText }, "*");
 }
 
-window.unityHighlightPDF = highlightPDFText; // Expose to Unity
+window.unityHighlightPDF = highlightPDFText;
