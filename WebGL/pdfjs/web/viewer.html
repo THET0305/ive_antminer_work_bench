@@ -697,6 +697,19 @@ function highlightText(text, highlightColor) {
         console.warn(`Text "${text}" not found in PDF.`);
     }
 }
+    
+  window.addEventListener("message", function(event) {
+    if (event.data?.type === "highlight") {
+      const viewer = document.getElementById("viewerContainer");
+
+      // Flash the viewer container
+      if (viewer) {
+        viewer.classList.add("pdf-flash");
+        setTimeout(() => viewer.classList.remove("pdf-flash"), 300);
+      }
+    }
+  });
+    
 </script>
 </body>
 </html>
