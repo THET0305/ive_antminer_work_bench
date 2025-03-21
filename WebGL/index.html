@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Unity Web Player | Miner Workbench</title>
     <!-- Favicon and StyleSheets -->
-    <link rel="shortcut icon" href="TemplateData/favicon.ico">
+    <link rel="shortcut icon" href="favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
     <link rel="manifest" href="manifest.webmanifest">
     <style>
@@ -45,13 +45,27 @@
         position: fixed;
         top: 10px;
         right: 10px;
-        font-family: Arial, sans-serif;
-        font-size: 80px;
-        color: white;
+        width: 400px;
+        height: 100px;
         opacity: 0.5;
         pointer-events: none;
         z-index: 10000;
         user-select: none;
+      }
+      .instruction-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        padding: 1rem;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        font-family: Arial, sans-serif;
+        text-align: center;
+        font-size: 1rem;
+        z-index: 9998;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
       }
     </style>
   </head>
@@ -86,6 +100,10 @@
           </div>
         </div>
         <div id="unity-warning"></div>
+        <!-- Instruction Overlay -->
+        <div id="instruction-overlay" class="instruction-overlay">
+          Click the ASIC miner to begin
+        </div>
       </div>
     </div>
 
@@ -95,7 +113,7 @@
     </div>
 
     <!-- Watermark -->
-    <div class="watermark">IVE</div>
+    <img class="watermark" src="watermark-400x100.png" alt="IVE Logo">
 
     <script>
       window.addEventListener("load", function () {
