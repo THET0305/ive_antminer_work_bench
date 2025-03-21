@@ -4,11 +4,11 @@
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Unity Web Player | Miner Workbench</title>
+    <!-- Favicon and StyleSheets -->
     <link rel="shortcut icon" href="TemplateData/favicon.ico">
     <link rel="stylesheet" href="TemplateData/style.css">
     <link rel="manifest" href="manifest.webmanifest">
     <style>
-      /* Container for the split view */
       #split-container {
         display: none;
         height: 100vh;
@@ -18,9 +18,8 @@
         overflow: hidden;
       }
       body.terms-accepted #split-container {
-  	display: flex; /* Show only after accepting terms */
+        display: flex;
       }
-      /* Left pane: PDF viewer */
       #pdf-container {
         flex-basis: 50%;
         border-right: 1px solid #ccc;
@@ -31,24 +30,21 @@
         height: 100%;
         border: none;
       }
-      /* Drag bar for resizing */
       #dragbar {
         width: 5px;
         background: #aaa;
         cursor: col-resize;
         user-select: none;
       }
-      /* Right pane: Unity WebGL */
       #unity-container {
         flex-grow: 1;
         position: relative;
         overflow: hidden;
       }
-      /* Watermark styling */
       .watermark {
         position: fixed;
-        bottom: 10px;
-        left: 10px;
+        top: 10px;
+        right: 10px;
         font-family: Arial, sans-serif;
         font-size: 80px;
         color: white;
@@ -60,41 +56,27 @@
     </style>
   </head>
   <body>
-  <!-- Terms Modal -->
-  <div id="terms-modal" style="
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.85);
-  color: white;
-  font-family: Arial, sans-serif;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-  padding: 2rem;
-  ">
-  <div style="background: #222; padding: 2rem; border-radius: 8px; max-width: 600px; text-align: left;">
-    <h2>Terms of Use</h2>
-    <p>
-      This demo is the property of <strong>Interactive Virtual Experiences (IVE)</strong>. It is provided as a proof-of-concept only.
-      All rights are reserved. No part of this demo may be copied, reproduced, reverse-engineered, or used in any form without express written permission from IVE.
-    </p>
-    <p>
-      By clicking "I Agree", you acknowledge and accept these terms and agree not to attempt to duplicate, modify, or redistribute any part of this work.
-    </p>
-    <button onclick="acceptTerms()" style="margin-top: 1rem; padding: 0.5rem 1rem; background: #00cc66; color: white; border: none; border-radius: 4px; font-size: 1rem;">I Agree</button>
-  </div>
-</div>
-    <div id="split-container">
-      <!-- PDF Viewer Pane -->
-      <div id="pdf-container">
-	<iframe id="pdf-viewer" src="pdfjs/web/viewer.html?file=AntminerS9FanRemoval.pdf"></iframe>
-	<script src="pdfjs/web/pdf-highlighter.js"></script>
+    <!-- Terms Modal -->
+    <div id="terms-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); color: white; font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; z-index: 9999; padding: 2rem;">
+      <div style="background: #222; padding: 2rem; border-radius: 8px; max-width: 600px; text-align: left;">
+        <h2>Terms of Use</h2>
+        <p>
+          This demo is the property of <strong>Interactive Virtual Experiences (IVE)</strong>. It is provided as a proof-of-concept only.
+          All rights are reserved. No part of this demo may be copied, reproduced, reverse-engineered, or used in any form without express written permission from IVE.
+        </p>
+        <p>
+          By clicking "I Agree", you acknowledge and accept these terms and agree not to attempt to duplicate, modify, or redistribute any part of this work.
+        </p>
+        <button onclick="acceptTerms()" style="margin-top: 1rem; padding: 0.5rem 1rem; background: #00cc66; color: white; border: none; border-radius: 4px; font-size: 1rem;">I Agree</button>
       </div>
-      <!-- Drag Bar for resizing -->
+    </div>
+
+    <div id="split-container">
+      <div id="pdf-container">
+        <iframe id="pdf-viewer" src="pdfjs/web/viewer.html?file=AntminerS9FanRemoval.pdf"></iframe>
+        <script src="pdfjs/web/pdf-highlighter.js"></script>
+      </div>
       <div id="dragbar"></div>
-      <!-- Unity WebGL Pane -->
       <div id="unity-container">
         <canvas id="unity-canvas" width="960" height="600" tabindex="-1"></canvas>
         <div id="unity-loading-bar">
@@ -107,10 +89,15 @@
       </div>
     </div>
 
+    <!-- Instruction Overlay -->
+    <div id="instruction-overlay" style="position: fixed; bottom: 0; left: 0; width: 100%; padding: 1rem; background: rgba(0, 0, 0, 0.7); color: white; font-family: Arial, sans-serif; text-align: center; font-size: 1rem; z-index: 9998; pointer-events: none; transition: opacity 0.3s ease;">
+      Click the ASIC miner to begin
+    </div>
+
     <!-- Watermark -->
     <div class="watermark">IVE</div>
+
     <script>
-      // Service Worker registration
       window.addEventListener("load", function () {
         if ("serviceWorker" in navigator) {
           navigator.serviceWorker.register("ServiceWorker.js");
@@ -132,11 +119,9 @@
         warningBanner.appendChild(div);
         if (type == 'error') {
           div.style = 'background: red; padding: 10px;';
-        } else {
-          if (type == 'warning') {
-            div.style = 'background: yellow; padding: 10px;';
-          }
-          setTimeout(function() {
+        } else if (type == 'warning') {
+          div.style = 'background: yellow; padding: 10px;';
+          setTimeout(() => {
             warningBanner.removeChild(div);
             updateBannerVisibility();
           }, 5000);
@@ -144,9 +129,6 @@
         updateBannerVisibility();
       }
 
-      // Check for hardware acceleration by attempting to create a WebGL context
-      // and inspecting the renderer. If it contains "swiftshader", it likely means
-      // hardware acceleration is disabled.
       function checkHardwareAcceleration() {
         var testCanvas = document.createElement('canvas');
         var gl = testCanvas.getContext('webgl') || testCanvas.getContext('experimental-webgl');
@@ -154,14 +136,11 @@
         var debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
         if (debugInfo) {
           var renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
-          if (renderer && renderer.toLowerCase().includes("swiftshader")) {
-            return false;
-          }
+          return !renderer.toLowerCase().includes("swiftshader");
         }
         return true;
       }
 
-      // Configure Unity build settings.
       var buildUrl = "Build";
       var loaderUrl = buildUrl + "/WebGL.loader.js";
       var config = {
@@ -176,26 +155,24 @@
         showBanner: unityShowBanner,
       };
 
-      // Warn the user if hardware acceleration appears to be disabled.
       if (!checkHardwareAcceleration()) {
-        unityShowBanner("Hardware acceleration appears to be disabled. Please enable hardware acceleration in your browser settings for optimal performance.", "warning");
+        unityShowBanner("Hardware acceleration appears to be disabled. Please enable it for best performance.", "warning");
       }
 
       if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
         var meta = document.createElement('meta');
         meta.name = 'viewport';
         meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
-        document.getElementsByTagName('head')[0].appendChild(meta);
+        document.head.appendChild(meta);
       }
 
       loadingBar.style.display = "block";
-
       var script = document.createElement("script");
       script.src = loaderUrl;
       script.onload = () => {
         createUnityInstance(canvas, config, (progress) => {
           progressBarFull.style.width = 100 * progress + "%";
-        }).then((unityInstance) => {
+        }).then(() => {
           loadingBar.style.display = "none";
         }).catch((message) => {
           alert(message);
@@ -203,7 +180,19 @@
       };
       document.body.appendChild(script);
 
-      // Resizable frames logic
+      let firstClickHandled = false;
+      canvas.addEventListener("mousedown", () => {
+        if (firstClickHandled) return;
+        firstClickHandled = true;
+        document.getElementById("instruction-overlay").innerHTML = `
+          <strong>Tool Instructions:</strong><br>
+          Right-Click + Hold & Drag: Rotate the Miner X & Y<br>
+          Left-Click + Hold & Drag: Rotate the Miner Z<br>
+          Middle Mouse Roll: Zoom In/Out<br>
+          Mouse Over: Clickable Parts will Highlight Green
+        `;
+      });
+
       (function() {
         var dragbar = document.getElementById("dragbar");
         var pdfContainer = document.getElementById("pdf-container");
@@ -218,18 +207,12 @@
 
         document.addEventListener("mousemove", function(e) {
           if (!dragging) return;
-          var containerOffsetLeft = splitContainer.offsetLeft;
-          var pointerRelativeXpos = e.clientX - containerOffsetLeft;
-          var containerWidth = splitContainer.offsetWidth;
-          // Set a minimum width for both panes (e.g., 100px)
+          var offset = e.clientX - splitContainer.offsetLeft;
           var minWidth = 100;
-          if(pointerRelativeXpos < minWidth) {
-            pointerRelativeXpos = minWidth;
-          }
-          if(containerWidth - pointerRelativeXpos < minWidth) {
-            pointerRelativeXpos = containerWidth - minWidth;
-          }
-          pdfContainer.style.flexBasis = pointerRelativeXpos + "px";
+          var containerWidth = splitContainer.offsetWidth;
+          if (offset < minWidth) offset = minWidth;
+          if (containerWidth - offset < minWidth) offset = containerWidth - minWidth;
+          pdfContainer.style.flexBasis = offset + "px";
         });
 
         document.addEventListener("mouseup", function() {
@@ -240,26 +223,24 @@
         });
       })();
 
-	function highlightPDFText(searchText) {
-      	    var pdfIframe = document.querySelector("#pdf-viewer");
-	    if (!pdfIframe) {
-	         console.error("PDF iframe not found.");
-	         return;
-	    }
+      function highlightPDFText(searchText) {
+        var pdfIframe = document.querySelector("#pdf-viewer");
+        if (pdfIframe) {
+          pdfIframe.contentWindow.postMessage({ type: "highlight", text: searchText }, "*");
+        } else {
+          console.error("PDF iframe not found.");
+        }
+      }
+      window.unityHighlightPDF = highlightPDFText;
 
-      	     // Send highlight request to PDF.js inside the iframe
-      	     pdfIframe.contentWindow.postMessage({ type: "highlight", text: searchText }, "*");
-  	 }
-
-	  // Expose function to Unity WebGL
-	  window.unityHighlightPDF = function(text) {
-	      highlightPDFText(text);
-	  };	
-    function acceptTerms() {
-  	document.getElementById("terms-modal").style.display = "none";
-  	document.body.classList.add("terms-accepted");
-    }
+      function acceptTerms() {
+        document.getElementById("terms-modal").style.display = "none";
+        document.body.classList.add("terms-accepted");
+      }
     </script>
+
+    <!-- Footer -->
+    <footer>©2025 Interactive Virtual Experiences. All rights reserved.</footer>
   </body>
-<footer>©2025 Interactive Virtual Experiences. All rights reserved.</footer>
 </html>
+
