@@ -32,6 +32,15 @@ See https://github.com/adobe-type-tools/cmap-resources
 <script src="../build/pdf.mjs" type="module"></script>
 <link rel="stylesheet" href="viewer.css">
 <script src="viewer.mjs" type="module"></script>    
+<-- Add the ability to "Flash" the window when there is a change detected -->
+    @keyframes flash-effect {
+      0%   { background-color: rgba(255, 255, 0, 0.4); }
+      100% { background-color: transparent; }
+    }
+    
+    .pdf-flash {
+      animation: flash-effect 0.4s ease;
+    } 
   </head>
 
   <body tabindex="0">
