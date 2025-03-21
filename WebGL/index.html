@@ -1,169 +1,245 @@
-<div id="split-container">
-  <div id="pdf-container">
-    <iframe id="pdf-viewer" src="pdfjs/web/viewer.html?file=AntminerS9FanRemoval.pdf"></iframe>
-    <script src="pdfjs/web/pdf-highlighter.js"></script>
-  </div>
-  <div id="dragbar"></div>
-  <div id="unity-container">
-    <canvas id="unity-canvas" width="960" height="600" tabindex="-1"></canvas>
-    <div id="unity-loading-bar">
-      <div id="unity-logo"></div>
-      <div id="unity-progress-bar-empty">
-        <div id="unity-progress-bar-full"></div>
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>Unity Web Player | Miner Workbench</title>
+    <!-- Favicon and StyleSheets -->
+    <link rel="shortcut icon" href="TemplateData/favicon.ico">
+    <link rel="stylesheet" href="TemplateData/style.css">
+    <link rel="manifest" href="manifest.webmanifest">
+    <style>
+      #split-container {
+        display: none;
+        height: 100vh;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+      body.terms-accepted #split-container {
+        display: flex;
+      }
+      #pdf-container {
+        flex-basis: 50%;
+        border-right: 1px solid #ccc;
+        overflow: hidden;
+      }
+      #pdf-container iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+      }
+      #dragbar {
+        width: 5px;
+        background: #aaa;
+        cursor: col-resize;
+        user-select: none;
+      }
+      #unity-container {
+        flex-grow: 1;
+        position: relative;
+        overflow: hidden;
+      }
+      .watermark {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        font-family: Arial, sans-serif;
+        font-size: 80px;
+        color: white;
+        opacity: 0.5;
+        pointer-events: none;
+        z-index: 10000;
+        user-select: none;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Terms Modal -->
+    <div id="terms-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); color: white; font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; z-index: 9999; padding: 2rem;">
+      <div style="background: #222; padding: 2rem; border-radius: 8px; max-width: 600px; text-align: left;">
+        <h2>Terms of Use</h2>
+        <p>
+          This demo is the property of <strong>Interactive Virtual Experiences (IVE)</strong>. It is provided as a proof-of-concept only.
+          All rights are reserved. No part of this demo may be copied, reproduced, reverse-engineered, or used in any form without express written permission from IVE.
+        </p>
+        <p>
+          By clicking "I Agree", you acknowledge and accept these terms and agree not to attempt to duplicate, modify, or redistribute any part of this work.
+        </p>
+        <button onclick="acceptTerms()" style="margin-top: 1rem; padding: 0.5rem 1rem; background: #00cc66; color: white; border: none; border-radius: 4px; font-size: 1rem;">I Agree</button>
       </div>
     </div>
-    <div id="unity-warning"></div>
-    <!-- Instruction Overlay scoped to Unity container only -->
-    <div id="instruction-overlay" class="instruction-overlay">
+
+    <div id="split-container">
+      <div id="pdf-container">
+        <iframe id="pdf-viewer" src="pdfjs/web/viewer.html?file=AntminerS9FanRemoval.pdf"></iframe>
+        <script src="pdfjs/web/pdf-highlighter.js"></script>
+      </div>
+      <div id="dragbar"></div>
+      <div id="unity-container">
+        <canvas id="unity-canvas" width="960" height="600" tabindex="-1"></canvas>
+        <div id="unity-loading-bar">
+          <div id="unity-logo"></div>
+          <div id="unity-progress-bar-empty">
+            <div id="unity-progress-bar-full"></div>
+          </div>
+        </div>
+        <div id="unity-warning"></div>
+      </div>
+    </div>
+
+    <!-- Instruction Overlay -->
+    <div id="instruction-overlay" style="position: fixed; bottom: 0; left: 0; width: 100%; padding: 1rem; background: rgba(0, 0, 0, 0.7); color: white; font-family: Arial, sans-serif; text-align: center; font-size: 1rem; z-index: 9998; pointer-events: none; transition: opacity 0.3s ease;">
       Click the ASIC miner to begin
     </div>
-  </div>
-</div>
 
-<!-- Watermark Image -->
-<img class="watermark" src="watermark-400x100.png" alt="IVE Logo">
+    <!-- Watermark -->
+    <div class="watermark">IVE</div>
 
-<script>
-  window.addEventListener("load", function () {
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("ServiceWorker.js");
-    }
-  });
+    <script>
+      window.addEventListener("load", function () {
+        if ("serviceWorker" in navigator) {
+          navigator.serviceWorker.register("ServiceWorker.js");
+        }
+      });
 
-  var container = document.querySelector("#unity-container");
-  var canvas = document.querySelector("#unity-canvas");
-  var loadingBar = document.querySelector("#unity-loading-bar");
-  var progressBarFull = document.querySelector("#unity-progress-bar-full");
-  var warningBanner = document.querySelector("#unity-warning");
+      var container = document.querySelector("#unity-container");
+      var canvas = document.querySelector("#unity-canvas");
+      var loadingBar = document.querySelector("#unity-loading-bar");
+      var progressBarFull = document.querySelector("#unity-progress-bar-full");
+      var warningBanner = document.querySelector("#unity-warning");
 
-  function unityShowBanner(msg, type) {
-    function updateBannerVisibility() {
-      warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
-    }
-    var div = document.createElement('div');
-    div.innerHTML = msg;
-    warningBanner.appendChild(div);
-    if (type == 'error') {
-      div.style = 'background: red; padding: 10px;';
-    } else if (type == 'warning') {
-      div.style = 'background: yellow; padding: 10px;';
-      setTimeout(() => {
-        warningBanner.removeChild(div);
+      function unityShowBanner(msg, type) {
+        function updateBannerVisibility() {
+          warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
+        }
+        var div = document.createElement('div');
+        div.innerHTML = msg;
+        warningBanner.appendChild(div);
+        if (type == 'error') {
+          div.style = 'background: red; padding: 10px;';
+        } else if (type == 'warning') {
+          div.style = 'background: yellow; padding: 10px;';
+          setTimeout(() => {
+            warningBanner.removeChild(div);
+            updateBannerVisibility();
+          }, 5000);
+        }
         updateBannerVisibility();
-      }, 5000);
-    }
-    updateBannerVisibility();
-  }
-
-  function checkHardwareAcceleration() {
-    var testCanvas = document.createElement('canvas');
-    var gl = testCanvas.getContext('webgl') || testCanvas.getContext('experimental-webgl');
-    if (!gl) return false;
-    var debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
-    if (debugInfo) {
-      var renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
-      return !renderer.toLowerCase().includes("swiftshader");
-    }
-    return true;
-  }
-
-  var buildUrl = "Build";
-  var loaderUrl = buildUrl + "/WebGL.loader.js";
-  var config = {
-    arguments: [],
-    dataUrl: buildUrl + "/WebGL.data.br",
-    frameworkUrl: buildUrl + "/WebGL.framework.js.br",
-    codeUrl: buildUrl + "/WebGL.wasm.br",
-    streamingAssetsUrl: "StreamingAssets",
-    companyName: "IVE",
-    productName: "Miner Workbench",
-    productVersion: "0.1.0",
-    showBanner: unityShowBanner,
-  };
-
-  if (!checkHardwareAcceleration()) {
-    unityShowBanner("Hardware acceleration appears to be disabled. Please enable it for best performance.", "warning");
-  }
-
-  if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
-    var meta = document.createElement('meta');
-    meta.name = 'viewport';
-    meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
-    document.head.appendChild(meta);
-  }
-
-  loadingBar.style.display = "block";
-  var script = document.createElement("script");
-  script.src = loaderUrl;
-  script.onload = () => {
-    createUnityInstance(canvas, config, (progress) => {
-      progressBarFull.style.width = 100 * progress + "%";
-    }).then(() => {
-      loadingBar.style.display = "none";
-    }).catch((message) => {
-      alert(message);
-    });
-  };
-  document.body.appendChild(script);
-
-  let firstClickHandled = false;
-  canvas.addEventListener("mousedown", () => {
-    if (firstClickHandled) return;
-    firstClickHandled = true;
-    document.getElementById("instruction-overlay").innerHTML = `
-      <strong>Tool Instructions:</strong><br>
-      Right-Click + Hold & Drag: Rotate the Miner X & Y<br>
-      Left-Click + Hold & Drag: Rotate the Miner Z<br>
-      Middle Mouse Roll: Zoom In/Out<br>
-      Mouse Over: Clickable Parts will Highlight Green
-    `;
-  });
-
-  (function() {
-    var dragbar = document.getElementById("dragbar");
-    var pdfContainer = document.getElementById("pdf-container");
-    var splitContainer = document.getElementById("split-container");
-    var dragging = false;
-
-    dragbar.addEventListener("mousedown", function(e) {
-      dragging = true;
-      document.body.style.cursor = "col-resize";
-      e.preventDefault();
-    });
-
-    document.addEventListener("mousemove", function(e) {
-      if (!dragging) return;
-      var offset = e.clientX - splitContainer.offsetLeft;
-      var minWidth = 100;
-      var containerWidth = splitContainer.offsetWidth;
-      if (offset < minWidth) offset = minWidth;
-      if (containerWidth - offset < minWidth) offset = containerWidth - minWidth;
-      pdfContainer.style.flexBasis = offset + "px";
-    });
-
-    document.addEventListener("mouseup", function() {
-      if (dragging) {
-        dragging = false;
-        document.body.style.cursor = "default";
       }
-    });
-  })();
 
-  function highlightPDFText(searchText) {
-    var pdfIframe = document.querySelector("#pdf-viewer");
-    if (pdfIframe) {
-      pdfIframe.contentWindow.postMessage({ type: "highlight", text: searchText }, "*");
-    } else {
-      console.error("PDF iframe not found.");
-    }
-  }
-  window.unityHighlightPDF = highlightPDFText;
+      function checkHardwareAcceleration() {
+        var testCanvas = document.createElement('canvas');
+        var gl = testCanvas.getContext('webgl') || testCanvas.getContext('experimental-webgl');
+        if (!gl) return false;
+        var debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+        if (debugInfo) {
+          var renderer = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+          return !renderer.toLowerCase().includes("swiftshader");
+        }
+        return true;
+      }
 
-  function acceptTerms() {
-    document.getElementById("terms-modal").style.display = "none";
-    document.body.classList.add("terms-accepted");
-  }
-</script>
+      var buildUrl = "Build";
+      var loaderUrl = buildUrl + "/WebGL.loader.js";
+      var config = {
+        arguments: [],
+        dataUrl: buildUrl + "/WebGL.data.br",
+        frameworkUrl: buildUrl + "/WebGL.framework.js.br",
+        codeUrl: buildUrl + "/WebGL.wasm.br",
+        streamingAssetsUrl: "StreamingAssets",
+        companyName: "IVE",
+        productName: "Miner Workbench",
+        productVersion: "0.1.0",
+        showBanner: unityShowBanner,
+      };
 
-<!-- Footer -->
-<footer>©2025 Interactive Virtual Experiences. All rights reserved.</footer>
+      if (!checkHardwareAcceleration()) {
+        unityShowBanner("Hardware acceleration appears to be disabled. Please enable it for best performance.", "warning");
+      }
+
+      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+        var meta = document.createElement('meta');
+        meta.name = 'viewport';
+        meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
+        document.head.appendChild(meta);
+      }
+
+      loadingBar.style.display = "block";
+      var script = document.createElement("script");
+      script.src = loaderUrl;
+      script.onload = () => {
+        createUnityInstance(canvas, config, (progress) => {
+          progressBarFull.style.width = 100 * progress + "%";
+        }).then(() => {
+          loadingBar.style.display = "none";
+        }).catch((message) => {
+          alert(message);
+        });
+      };
+      document.body.appendChild(script);
+
+      let firstClickHandled = false;
+      canvas.addEventListener("mousedown", () => {
+        if (firstClickHandled) return;
+        firstClickHandled = true;
+        document.getElementById("instruction-overlay").innerHTML = `
+          <strong>Tool Instructions:</strong><br>
+          Right-Click + Hold & Drag: Rotate the Miner X & Y<br>
+          Left-Click + Hold & Drag: Rotate the Miner Z<br>
+          Middle Mouse Roll: Zoom In/Out<br>
+          Mouse Over: Clickable Parts will Highlight Green
+        `;
+      });
+
+      (function() {
+        var dragbar = document.getElementById("dragbar");
+        var pdfContainer = document.getElementById("pdf-container");
+        var splitContainer = document.getElementById("split-container");
+        var dragging = false;
+
+        dragbar.addEventListener("mousedown", function(e) {
+          dragging = true;
+          document.body.style.cursor = "col-resize";
+          e.preventDefault();
+        });
+
+        document.addEventListener("mousemove", function(e) {
+          if (!dragging) return;
+          var offset = e.clientX - splitContainer.offsetLeft;
+          var minWidth = 100;
+          var containerWidth = splitContainer.offsetWidth;
+          if (offset < minWidth) offset = minWidth;
+          if (containerWidth - offset < minWidth) offset = containerWidth - minWidth;
+          pdfContainer.style.flexBasis = offset + "px";
+        });
+
+        document.addEventListener("mouseup", function() {
+          if (dragging) {
+            dragging = false;
+            document.body.style.cursor = "default";
+          }
+        });
+      })();
+
+      function highlightPDFText(searchText) {
+        var pdfIframe = document.querySelector("#pdf-viewer");
+        if (pdfIframe) {
+          pdfIframe.contentWindow.postMessage({ type: "highlight", text: searchText }, "*");
+        } else {
+          console.error("PDF iframe not found.");
+        }
+      }
+      window.unityHighlightPDF = highlightPDFText;
+
+      function acceptTerms() {
+        document.getElementById("terms-modal").style.display = "none";
+        document.body.classList.add("terms-accepted");
+      }
+    </script>
+
+    <!-- Footer -->
+    <footer>©2025 Interactive Virtual Experiences. All rights reserved.</footer>
+  </body>
+</html>
