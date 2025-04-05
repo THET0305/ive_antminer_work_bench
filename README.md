@@ -8,9 +8,7 @@ This repository contains the development files and CI/CD pipeline for the **ASIC
 
 ## 🌐 Deploy URL
 
-[🔗 ASIC Workbench Demo](https://antminer-workbench-demo.netlify.app/)
-
-[![Netlify Status](https://api.netlify.com/api/v1/badges/6937de4f-7df0-4e27-a79d-cb85481a7646/deploy-status)](https://app.netlify.com/sites/antminer-workbench-demo/deploys)
+[🔗 ASIC Workbench Demo AWS](https://dniu0jcxbfewl.cloudfront.net)
 
 ---
 
@@ -65,7 +63,8 @@ Deployed to a **web server**, accessible from any modern web browser.
 - **Express.js**: For serving localized builds during development.
 
 ### 🌐 Hosting
-- **Netlify.com**: Hosting the demo with CI/CD integration via GitHub.
+- **AWS S3.com**: Hosting of the build
+- **AWS CloudFront.com**: ??
 
 ---
 
