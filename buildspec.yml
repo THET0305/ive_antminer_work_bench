@@ -9,29 +9,28 @@ phases:
       - echo "No Unity build step needed. Files are already in WebGL/."
   post_build:
     commands:
-      - echo "Starting S3 upload..."
+      - echo "Uploading Brotli-compressed and uncompressed files to S3..."
 
-      # Upload Brotli-compressed JavaScript
-      - aws s3 cp WebGL/ s3://ive-asic-workbench/ --recursive \
+      # Upload Brotli JavaScript files
+      - aws s3 cp WebGL/ s3://your-bucket-name/ --recursive \
           --exclude "*" --include "*.js.br" \
           --content-encoding br --content-type application/javascript
 
-      # Upload Brotli-compressed WASM
-      - aws s3 cp WebGL/ s3://ive-asic-workbench/ --recursive \
+      # Upload Brotli WASM files
+      - aws s3 cp WebGL/ s3://your-bucket-name/ --recursive \
           --exclude "*" --include "*.wasm.br" \
           --content-encoding br --content-type application/wasm
 
-      # Upload Brotli-compressed DATA
-      - aws s3 cp WebGL/ s3://ive-asic-workbench/ --recursive \
+      # Upload Brotli DATA files
+      - aws s3 cp WebGL/ s3://your-bucket-name/ --recursive \
           --exclude "*" --include "*.data.br" \
           --content-encoding br --content-type application/octet-stream
 
-      # Upload remaining static files (HTML, JS, etc.)
-      - aws s3 cp WebGL/ s3://ive-asic-workbench/ --recursive \
+      # Upload remaining (uncompressed) static files
+      - aws s3 cp WebGL/ s3://your-bucket-name/ --recursive \
           --exclude "*.br"
 
       - echo "Upload complete."
 artifacts:
   files:
     - WebGL/**/*
-
