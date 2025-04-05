@@ -10,27 +10,12 @@ phases:
   post_build:
     commands:
       - echo "Uploading Brotli-compressed and uncompressed files to S3..."
-
-      # Upload Brotli JavaScript files
-      - aws s3 cp WebGL/ s3://your-bucket-name/ --recursive \
-          --exclude "*" --include "*.js.br" \
-          --content-encoding br --content-type application/javascript
-
-      # Upload Brotli WASM files
-      - aws s3 cp WebGL/ s3://your-bucket-name/ --recursive \
-          --exclude "*" --include "*.wasm.br" \
-          --content-encoding br --content-type application/wasm
-
-      # Upload Brotli DATA files
-      - aws s3 cp WebGL/ s3://your-bucket-name/ --recursive \
-          --exclude "*" --include "*.data.br" \
-          --content-encoding br --content-type application/octet-stream
-
-      # Upload remaining (uncompressed) static files
-      - aws s3 cp WebGL/ s3://your-bucket-name/ --recursive \
-          --exclude "*.br"
-
+      - aws s3 cp WebGL/ s3://your-bucket-name/ --recursive --exclude "*" --include "*.js.br" --content-encoding br --content-type application/javascript
+      - aws s3 cp WebGL/ s3://your-bucket-name/ --recursive --exclude "*" --include "*.wasm.br" --content-encoding br --content-type application/wasm
+      - aws s3 cp WebGL/ s3://your-bucket-name/ --recursive --exclude "*" --include "*.data.br" --content-encoding br --content-type application/octet-stream
+      - aws s3 cp WebGL/ s3://your-bucket-name/ --recursive --exclude "*.br"
       - echo "Upload complete."
+
 artifacts:
   files:
     - WebGL/**/*
