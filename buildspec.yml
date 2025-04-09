@@ -1,0 +1,21 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      nodejs: 14
+  build:
+    commands:
+      - echo "No Unity build step needed. Files are already in WebGL/."
+  post_build:
+    commands:
+      - echo "Uploading Brotli-compressed and uncompressed files to S3..."
+      - aws s3 cp WebGL/ s3://ive-asic-workbench/ --recursive --exclude "*" --include "*.js.br" --content-encoding br --content-type application/javascript
+      - aws s3 cp WebGL/ s3://ive-asic-workbench/ --recursive --exclude "*" --include "*.wasm.br" --content-encoding br --content-type application/wasm
+      - aws s3 cp WebGL/ s3://ive-asic-workbench/ --recursive --exclude "*" --include "*.data.br" --content-encoding br --content-type application/octet-stream
+      - aws s3 cp WebGL/ s3://ive-asic-workbench/ --recursive --exclude "*.br"
+      - echo "Upload complete."
+
+artifacts:
+  files:
+    - WebGL/**/*
