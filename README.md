@@ -8,7 +8,7 @@ This repository contains the development files and CI/CD pipeline for the **ASIC
 
 ## 🌐 Deploy URL
 
-[🔗 ASIC Workbench Demo AWS](https://dniu0jcxbfewl.cloudfront.net)
+[🔗 ASIC Workbench Demo AWS](https://dniu0jcxbfewl.cloudfront.net) (Currently Shutdown)
 
 ---
 
