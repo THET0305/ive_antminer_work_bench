@@ -16,9 +16,9 @@ This repository contains the build files and CI/CD pipeline for the **ASIC Workb
 
 ## Project Overview
 
-This project is a **demonstration version** of a potential **WebGL-based interactive training tool**, designed to showcase how technicians could be trained to properly **remove and replace components** on an **ASIC cryptocurrency miner**.
+This project is a demonstration version of a potential WebGL-based interactive training tool, designed to showcase how technicians could be trained to properly remove and replace components on an ASIC cryptocurrency miner.
 
-In its current demo state, the tool focuses on **the removal of a single cooling fan** and highlights the corresponding step in a **step-by-step PDF guide** embedded alongside the interactive 3D content. The demo is intended to present the concept to stakeholders and demonstrate how such a tool could be expanded into a complete training system.
+In its current demo state, the tool focuses on the removal of a single cooling fan and highlights the corresponding step in a step-by-step PDF guide embedded alongside the interactive 3D content. The demo is intended to present the concept to stakeholders and demonstrate how such a tool could be expanded into a complete training system.
 
 ---
 
@@ -28,19 +28,19 @@ In its current demo state, the tool focuses on **the removal of a single cooling
 Rotate, inspect, and interact with the Antminer S9 model, focusing on the cooling fan removal process.
 
 ### Guided Teardown Process
-The demo highlights the **correct procedural steps** for removing the fan, ensuring process accuracy.
+The demo highlights the correct procedural steps for removing the fan, ensuring process accuracy.
 
 ### PDF Integration
-A step-by-step **PDF guide** is embedded into the interface, dynamically highlighting the current step.
+A step-by-step PDF guide is embedded into the interface, dynamically highlighting the current step.
 
 ### WebGL Optimized
 Runs directly in a browser—no software installation required.
 
 ### Realistic Workbench Environment
-A **clean, grid-style workbench** environment focuses attention on the device and process.
+A clean, grid-style workbench environment focuses attention on the device and process.
 
 ### Cloud Hosted
-Deployed to a **web server**, accessible from any modern web browser.
+Deployed to a web server, accessible from any modern web browser.
 
 ---
 
