@@ -77,4 +77,5 @@ This demo serves as a **proof-of-concept** to pitch the potential for a fully-fe
 
 ## 🚦 Status
 
-✅ Demo Complete – Awaiting stakeholder feedback for full development approval.
+~~✅ Demo Complete – Awaiting stakeholder feedback for full development approval.~~
+🚫 Demo Complete – Stakeholder elected not to proceed with further development.
